@@ -114,3 +114,6 @@ void PixelTerm::DrawImage(int x, int y, Image *image)
 	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
 	XPutImage(Xi->display, Xi->window, gc, image->Ximage, 0, 0, x, y, image->Width, image->Height);
 }
+
+int PixelTerm::GetWidth() { return Width; }
+int PixelTerm::GetHeight() { return Height; }

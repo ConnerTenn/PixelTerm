@@ -6,29 +6,27 @@
 
 int main()
 {
-	PixelTerm::Init();
+	Projection renderer;
 
-	Matrix<int,2,2> mat1 = {{1,2},{3,4}};
-	Matrix<int,2,2> mat2 = {{5,6},{7,8}};
-
-	Matrix<int,2,2> mat3 = mat1 * mat2;
-
-	std::cout << mat1.String() <<"\n"<< mat2.String() <<"\n"<< mat3.String() <<"\n";
-
-	for (int i = 0; i < 400; i++)
+	for (int i = 0; i < 1000; i++)
 	{
-		PixelTerm::ForceClear();
+		Camera cam;
+		cam.Position = {12*sin(TAU*i/1000),10,12*cos(TAU*i/1000)};
+		cam.Rotation = {0,-TAU*i/1000,0};
 
+		Line line1{{10,0,0},{0,0,0}};
+		Line line2{{0,10,0},{0,0,0}};
+		Line line3{{0,0,10},{0,0,0}};
+		//double z2 = 2.5;//-(double)i/50.0;
+		//Line line2{{0.5,0.5,z2},{-0.5,-0.5,z2}};
+		renderer.QueueLine(line1);
+		renderer.QueueLine(line2);
+		renderer.QueueLine(line3);
 
-		PixelTerm::Draw();
-		//printf("Sleep\n");
-		usleep(0.0001*1000*1000);
+		renderer.Render(cam);
+
+		usleep(0.001*1000*1000);
 	}
-
-
-	PixelTerm::Close();
-
-	printf("Done\n");
 	
 	return 0;
 }
