@@ -1,26 +1,25 @@
 
 
+#include <iostream>
 #include "PixelTerm.h"
+#include "Projection.h"
 
 int main()
 {
 	PixelTerm::Init();
 
-	Image image(400, 400);
+	Matrix<int,2,2> mat1 = {{1,2},{3,4}};
+	Matrix<int,2,2> mat2 = {{5,6},{7,8}};
+
+	Matrix<int,2,2> mat3 = mat1 * mat2;
+
+	std::cout << mat1.String() <<"\n"<< mat2.String() <<"\n"<< mat3.String() <<"\n";
 
 	for (int i = 0; i < 400; i++)
 	{
 		PixelTerm::ForceClear();
-		for (int y = 0; y < 400; y++)
-		{
-			for (int x = 0; x < 400; x++)
-			{
-				PixelTerm::DrawPixel(x,y,{0,(x>0+i&&x<20+i)*255});
-				//image.Pixel(x,y,{0,(x>0+i&&x<20+i)*255});
-			}
-		}
-		//PixelTerm::DrawRectangle(50+1*i, 50, 100, 200, {0xff,0,0});
-		//PixelTerm::DrawImage(0,0,&image);
+
+
 		PixelTerm::Draw();
 		//printf("Sleep\n");
 		usleep(0.0001*1000*1000);

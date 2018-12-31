@@ -8,10 +8,12 @@ LINK=-pthread -lgdk_pixbuf_xlib-2.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0
 CFLAGS=$(OPTS) -I w3mimg $(INCLUDE)
 CC=g++
 
+force:
+
 all: PixelTerm.o .PHONY main
 .PHONY: $(SUBDIRS)
 
-main: main.cpp PixelTerm.o
+main: main.cpp PixelTerm.o Projection.h
 	@echo Compile: $(CC) $@
 	@$(CC) $(CFLAGS) $(OBJS) $(LINK) $(LINK) $< -o $@
 
@@ -23,7 +25,7 @@ $(SUBDIRS):
 	@cd $@ && $(MAKE) OPTS="$(OPTS)" INCLUDE="$(INCLUDE)"
 
 clean:
-	@rm -f *.o
+	@rm -f *.o main
 	@for dir in $(SUBDIRS); do \
 		(cd $$dir && $(MAKE) clean); \
 	done
