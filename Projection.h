@@ -5,8 +5,8 @@
 #include <vector>
 #include <math.h>
 
-#define PI M_PIl
-#define TAU (PI*2.0L)
+#define PI M_PI
+#define TAU (PI*2.0)
 
 template<class T, int Width, int Height>  
 struct Matrix
@@ -220,14 +220,22 @@ public:
 		LineList.push_back(line);
 	}
 
+	void QueueLines(std::vector<Line> lines)
+	{
+		for (int i = 0; i < lines.size(); i++)
+		{
+			LineList.push_back(lines[i]);
+		}
+	}
+
 	void Render(const Camera &cam)
 	{
 		PixelTerm::ForceClear();
 
 
 		Matrix<double,4,4> projmat;
-		projmat = GetScaleMat(400, 400, 1) * GetTransMat(0.5, 0.5, 0) * GetScaleMat(1,-1,1) * GetProjMat() * 
-					GetRotMatX(cam.Rotation.X) *GetRotMatY(cam.Rotation.Y) * GetTransMat(-cam.Position.X,-cam.Position.Y,-cam.Position.Z);
+		projmat = GetScaleMat(PixelTerm::GetWidth(), PixelTerm::GetHeight(), 1) * GetTransMat(0.5, 0.5, 0) * GetScaleMat(1,-1,1) * GetProjMat() * 
+					GetRotMatX(cam.Rotation.Z) * GetRotMatX(cam.Rotation.X) * GetRotMatY(cam.Rotation.Y) * GetTransMat(-cam.Position.X,-cam.Position.Y,-cam.Position.Z);
 
 		//std::cout << projmat.String() << "\n";
 
@@ -246,3 +254,56 @@ public:
 	}
 };
 
+
+
+
+
+
+
+
+#include <termios.h>
+#include <sys/ioctl.h>
+//#include <stdlib.h>
+#include <string.h>
+
+struct termios orig_termios;
+
+void reset_terminal_mode()
+{
+	tcsetattr(0, TCSANOW, &orig_termios);
+}
+
+void set_conio_terminal_mode()
+{
+	struct termios new_termios;
+
+	// take two copies - one for now, one for later
+	tcgetattr(0, &orig_termios);
+	memcpy(&new_termios, &orig_termios, sizeof(new_termios));
+
+	// register cleanup handler, and set the new terminal mode
+	atexit(reset_terminal_mode);
+	//cfmakeraw(&new_termios);
+	new_termios.c_lflag &= ~(ECHO | ECHONL| ICANON | IEXTEN);
+	
+	//new_termios.c_oflag |= ONLCR;
+	//new_termios.c_lflag |= ISIG;
+	tcsetattr(0, TCSANOW, &new_termios);
+}
+
+int kbhit()
+{
+	struct timeval tv = { 0L, 0L };
+	fd_set fds;
+	FD_ZERO(&fds);
+	FD_SET(0, &fds);
+	return select(1, &fds, NULL, NULL, &tv);
+}
+
+int getch()
+{
+	int r;
+	unsigned char c;
+	if ((r = read(0, &c, sizeof(c))) < 0) { return r; }
+	else { return c; }
+}
