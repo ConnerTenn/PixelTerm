@@ -199,12 +199,17 @@ public:
 				{  0,          0,   0,          1 }};
 	}
 
-	Matrix<double,4,4> GetRotnMatZ(double ang)
+	Matrix<double,4,4> GetRotMatZ(double ang)
 	{
 		return {{  cos(ang),  -sin(ang),   0,   0 },
 				{  sin(ang),   cos(ang),   0,   0 },
 				{  0,          0,          1,   0 },
 				{  0,          0,          0,   1 }};
+	}
+
+	Matrix<double,4,4> GetRotMatXYZ(double x, double y, double z)
+	{
+		return GetRotMatZ(z) * GetRotMatX(x) * GetRotMatY(y);
 	}
 
 private:
@@ -235,7 +240,7 @@ public:
 
 		Matrix<double,4,4> projmat;
 		projmat = GetScaleMat(PixelTerm::GetWidth(), PixelTerm::GetHeight(), 1) * GetTransMat(0.5, 0.5, 0) * GetScaleMat(1,-1,1) * GetProjMat() * 
-					GetRotMatX(cam.Rotation.Z) * GetRotMatX(cam.Rotation.X) * GetRotMatY(cam.Rotation.Y) * GetTransMat(-cam.Position.X,-cam.Position.Y,-cam.Position.Z);
+					GetRotMatZ(cam.Rotation.Z) * GetRotMatX(cam.Rotation.X) * GetRotMatY(cam.Rotation.Y) * GetTransMat(-cam.Position.X,-cam.Position.Y,-cam.Position.Z);
 
 		//std::cout << projmat.String() << "\n";
 
