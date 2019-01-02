@@ -50,19 +50,19 @@ int main()
 
 				double x2 = x1+cos(a1)*cos(a2);
 				double z2 = z1+sin(a1)*cos(a2);
-				double y2 = sin(a2);
+				double y2 = 3*sin(a2);
 
 				double x2n = x1+cos(a1)*cos(a2n);
 				double z2n = z1+sin(a1)*cos(a2n);
-				double y2n = sin(a2n);
+				double y2n = 3*sin(a2n);
 
 				double x3n = x1n+cos(a1n)*cos(a2);
 				double z3n = z1n+sin(a1n)*cos(a2);
-				double y3n = sin(a2);
+				double y3n = 3*sin(a2);
 
 				double x3nn = x1n+cos(a1n)*cos(a2n);
 				double z3nn = z1n+sin(a1n)*cos(a2n);
-				double y3nn = sin(a2n);
+				double y3nn = 3*sin(a2n);
 
 				lines.push_back(Line{{x2,y2,z2}, {x2n,y2n,z2n}}.Transform(transMat));
 				lines.push_back(Line{{x2,y2,z2}, {x3n,y3n,z3n}}.Transform(transMat));
