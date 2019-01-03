@@ -64,6 +64,7 @@ public:
 	static void DrawRectangle(int x, int y, int w, int h, RGB colour);
 	static void DrawLine(int x1, int y1, int x2, int y2, RGB colour);
 	static void DrawImage(int x, int y, Image *image);
+	//static void DrawText(int x, int y, )
 
 	static int GetWidth();
 	static int GetHeight();
