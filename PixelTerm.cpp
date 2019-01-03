@@ -113,6 +113,27 @@ void PixelTerm::DrawImage(int x, int y, Image *image)
 	unsigned long mask = GCForeground | GCBackground;
 	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
 	XPutImage(Xi->display, Xi->window, gc, image->Ximage, 0, 0, x, y, image->Width, image->Height);
+	XFreeGC(Xi->display, gc);
+}
+void PixelTerm::DrawText(int x, int y, std::string text, RGB colour)
+{
+	
+	//
+	XGCValues values;
+	values.foreground = colour.XColour();
+	//values.font = font->fid;
+	unsigned long mask = GCForeground;// | GCFont;
+	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
+	//XFontStruct *font = XQueryFont(Xi->display, XGContextFromGC(gc));
+	//XTextItem textItem;
+	//textItem.chars = (char *)text.c_str();
+	//textItem.nchars = text.length();
+	//textItem.font = font->fid;
+	//XDrawText(Xi->display, Xi->window, gc, x, y, &textItem, 1);
+	//XFreeFontInfo(0, font, 1);
+	//XDrawImageString(Xi->display, Xi->window, gc, x, y, text.c_str(), text.length());
+	XDrawString(Xi->display, Xi->window, gc, x, y, text.c_str(), text.length());
+	XFreeGC(Xi->display, gc);
 }
 
 int PixelTerm::GetWidth() { return Width; }
