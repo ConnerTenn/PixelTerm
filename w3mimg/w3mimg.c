@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "w3mimg/w3mimg.h"
+#include <w3mimg.h>
 
 w3mimg_op *
 w3mimg_open()

@@ -9,23 +9,23 @@
 #include <unistd.h>
 #include <string>
 
-#include "w3mimg/w3mimg.h"
+//#include "w3mimg.h"
 
-typedef u_int8_t u8;
+/*typedef u_int8_t u8;
 typedef u_int16_t u16;
 typedef u_int32_t u32;
 typedef u_int64_t u64;
 typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
-typedef int64_t s64;
+typedef int64_t s64;*/
 
 struct RGB
 {
-	u8 R;
-	u8 G;
-	u8 B;
-	u64 XColour();
+	u_int8_t R;
+	u_int8_t G;
+	u_int8_t B;
+	u_int64_t XColour();
 };
 
 class PixelTerm;
@@ -36,7 +36,7 @@ class Image
 	friend PixelTerm;
 private:
 	XImage *Ximage;
-	u32 *Raw;
+	u_int32_t *Raw;
 	int Width, Height;
 public:
 	Image(int width, int height);

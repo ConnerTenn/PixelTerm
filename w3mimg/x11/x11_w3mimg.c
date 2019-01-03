@@ -4,7 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "w3mimg/w3mimg.h"
+#include <w3mimg.h>
 
 #if defined(USE_IMLIB)
 #include <Imlib.h>

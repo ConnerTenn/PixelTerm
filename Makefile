@@ -5,7 +5,7 @@ INCLUDE=-I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.
 OBJS=PixelTerm.o w3mimg/w3mimg.o w3mimg/x11/x11_w3mimg.o w3mimg/fb/fb_w3mimg.o w3mimg/fb/fb.o w3mimg/fb/fb_img.o
 OPTS=-g -I ./
 LINK=-pthread -lgdk_pixbuf_xlib-2.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype  -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -lX11
-CFLAGS=$(OPTS) -I w3mimg $(INCLUDE)
+CFLAGS=$(OPTS) $(INCLUDE)
 CC=g++
 
 force:
@@ -15,7 +15,7 @@ all: PixelTerm.o .PHONY libPixelTerm.a example
 
 example: example.cpp Projection.h libPixelTerm.a
 	@echo Compile: $(CC) $@
-	@$(CC) $(CFLAGS) $< libPixelTerm.a $(LINK) $(LINK) -o $@
+	@$(CC) $(CFLAGS) $< libPixelTerm.a $(LINK) -o $@
 
 libPixelTerm.a: $(OBJS)
 	@echo Creating Library: $@

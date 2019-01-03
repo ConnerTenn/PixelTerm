@@ -4,7 +4,7 @@
 //RGB::RGB() { }
 //RGB::RGB(u64 data) { Pixel = data; }
 //RGB::RGB(u8 r, u8 g, u8 b) { R=r; G=g; B=b; }
-u64 RGB::XColour()
+u_int64_t RGB::XColour()
 {
 	return (B<<8*0) | (G<<8*1) | (R<<8*2) | (0xff<<8*3);
 }
@@ -19,7 +19,7 @@ Image::Image(int width, int height)
 	XGetWindowAttributes(PixelTerm::Xi->display, PixelTerm::Xi->window, &attr);
 	XVisualInfo info;
 	XMatchVisualInfo(PixelTerm::Xi->display, 0, attr.depth, TrueColor, &info);
-	u32 *data = new u32[width*height];
+	u_int32_t *data = new u_int32_t[width*height];
 	Raw = data;
 	Ximage = XCreateImage(PixelTerm::Xi->display, info.visual, attr.depth, XYPixmap, 0, (char *)data, width, height, 32, 0);
 	XInitImage(Ximage);
