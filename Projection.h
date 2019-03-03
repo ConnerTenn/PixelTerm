@@ -233,28 +233,33 @@ public:
 		}
 	}
 
-	void Render(const Camera &cam)
+	void Render(long long t)
 	{
 		PixelTerm::ForceClear();
 		PixelTerm::DrawText(10,20,"PixelTerm Demo", {0,0xff,0});
 
+		int width = PixelTerm::GetHeight();
+		int height = PixelTerm::GetHeight();
 
-		Matrix<double,4,4> projmat;
-		projmat = GetScaleMat(PixelTerm::GetWidth(), PixelTerm::GetHeight(), 1) * GetTransMat(0.5, 0.5, 0) * GetScaleMat(1,-1,1) * GetProjMat() * 
-					GetRotMatZ(cam.Rotation.Z) * GetRotMatX(cam.Rotation.X) * GetRotMatY(cam.Rotation.Y) * GetTransMat(-cam.Position.X,-cam.Position.Y,-cam.Position.Z);
-
+		Matrix<double,4,4> projmat, screenmat;
+		projmat = GetProjMat() * GetTransMat(0,0,-30) * GetRotMatY(-TAU*t/1000);
+		//screenmat = GetScaleMat(width, height, 1) * GetTransMat(0.5, 0.5, 0) * GetScaleMat(1,-1,1);
 		//std::cout << projmat.String() << "\n";
 
 		for (int i = 0; i < LineList.size(); i++)
 		{
 			Line line = LineList[i];
-			line = line.Transform(projmat);
-			//std::cout << line.String() << "\n";
+
+			line.Point1 = Vec3::FromMat(projmat * line.Point1.ToMat());
+			line.Point2 = Vec3::FromMat(projmat * line.Point2.ToMat());
+
+			line.Point1 = { (line.Point1.X+0.5)*width, (-line.Point1.Y+0.5)*height, 1};
+			line.Point2 = { (line.Point2.X+0.5)*width, (-line.Point2.Y+0.5)*height, 1};
+
 			DrawLine(line);
 		}
 		LineList.clear();
 
-		//std::cout << "\n";
 
 		PixelTerm::Draw();
 	}
