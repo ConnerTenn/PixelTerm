@@ -66,6 +66,16 @@ void PixelTerm::Close()
 	W_op->close(W_op);
 }
 
+
+Window PixelTerm::GetWindow()
+{
+	return Xi->window;
+}
+Display *PixelTerm::GetDisplay()
+{
+	return Xi->display;
+}
+
 void PixelTerm::Draw()
 {
 	W_op->sync(W_op);
@@ -94,6 +104,15 @@ void PixelTerm::DrawRectangle(int x, int y, int w, int h, RGB colour)
 	unsigned long mask = GCForeground;
 	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
 	XFillRectangle(Xi->display, Xi->window, gc, x, y, w, h);
+	XFreeGC(Xi->display, gc);
+}
+void PixelTerm::OutlineRectangle(int x, int y, int w, int h, RGB colour)
+{
+	XGCValues values;
+	values.foreground = colour.XColour();
+	unsigned long mask = GCForeground;
+	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
+	XDrawRectangle(Xi->display, Xi->window, gc, x, y, w, h);
 	XFreeGC(Xi->display, gc);
 }
 void PixelTerm::DrawLine(int x1, int y1, int x2, int y2, RGB colour)

@@ -57,12 +57,16 @@ private:
 public:
 	static bool Init();
 	static void Close();
+	
+	static Window GetWindow();
+	static Display *GetDisplay();
 
 	static void Draw();
 	static void Clear();
 	static void ForceClear();
 	static void DrawPixel(int x, int y, RGB colour);
 	static void DrawRectangle(int x, int y, int w, int h, RGB colour);
+	static void OutlineRectangle(int x, int y, int w, int h, RGB colour);
 	static void DrawLine(int x1, int y1, int x2, int y2, RGB colour);
 	static void DrawImage(int x, int y, Image *image);
 	static void DrawText(int x, int y, std::string text, RGB colour);
