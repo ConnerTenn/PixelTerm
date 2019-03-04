@@ -241,21 +241,22 @@ public:
 		int width = PixelTerm::GetHeight();
 		int height = PixelTerm::GetHeight();
 
-		Matrix<double,4,4> projmat, screenmat;
-		projmat = GetProjMat() * GetTransMat(0,0,-30) * GetRotMatY(-TAU*t/1000);
-		//screenmat = GetScaleMat(width, height, 1) * GetTransMat(0.5, 0.5, 0) * GetScaleMat(1,-1,1);
-		//std::cout << projmat.String() << "\n";
+		//Rotate the cube about the origin, then translate it to -30, then apply projection
+		Matrix<double,4,4> projmat = GetProjMat() * GetTransMat(0,0,-30) * GetRotMatY(-TAU*t/1000);
 
 		for (int i = 0; i < LineList.size(); i++)
 		{
 			Line line = LineList[i];
 
+			//Apply projection to each point, and then convert back to a point
 			line.Point1 = Vec3::FromMat(projmat * line.Point1.ToMat());
 			line.Point2 = Vec3::FromMat(projmat * line.Point2.ToMat());
 
+			//Convert each point to screen coordinates
 			line.Point1 = { (line.Point1.X+0.5)*width, (-line.Point1.Y+0.5)*height, 1};
 			line.Point2 = { (line.Point2.X+0.5)*width, (-line.Point2.Y+0.5)*height, 1};
 
+			//Draw the point
 			DrawLine(line);
 		}
 		LineList.clear();

@@ -16,6 +16,7 @@ int main()
 		renderer.QueueLine(Line{{0,10,0},{0,0,0}});
 		renderer.QueueLine(Line{{0,0,10},{0,0,0}});
 
+		//Load coordinates of a cube, centered on the origin
 		renderer.QueueLine(		Line{ {-10,-10, 10}, { 10,-10, 10} }	);
 		renderer.QueueLine(		Line{ {-10, 10, 10}, { 10, 10, 10} }	);
 		renderer.QueueLine(		Line{ {-10, 10, 10}, {-10,-10, 10} }	);
