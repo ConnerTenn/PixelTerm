@@ -24,13 +24,6 @@ Image::Image(int width, int height)
 	Ximage = XCreateImage(PixelTerm::Xi->display, info.visual, attr.depth, XYPixmap, 0, (char *)data, width, height, 32, 0);
 	XInitImage(Ximage);
 }
-/*Image::Image(const Image &other)
-{
-	printf("Copy Image\n");
-	Ximage = other.Ximage;
-	Width = other.Width;
-	Height = other.Height;
-}*/
 Image::~Image()
 {
 	XDestroyImage(Ximage);
@@ -138,3 +131,53 @@ void PixelTerm::DrawText(int x, int y, std::string text, RGB colour)
 
 int PixelTerm::GetWidth() { return Width; }
 int PixelTerm::GetHeight() { return Height; }
+
+
+
+
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <string.h>
+
+struct termios orig_termios;
+
+void reset_terminal_mode()
+{
+	tcsetattr(0, TCSANOW, &orig_termios);
+}
+
+void set_conio_terminal_mode()
+{
+	struct termios new_termios;
+
+	// take two copies - one for now, one for later
+	tcgetattr(0, &orig_termios);
+	memcpy(&new_termios, &orig_termios, sizeof(new_termios));
+
+	// register cleanup handler, and set the new terminal mode
+	atexit(reset_terminal_mode);
+	//cfmakeraw(&new_termios);
+	//new_termios.c_oflag &= ~OPOST;
+	new_termios.c_lflag &= ~(ECHO | ECHONL| ICANON | IEXTEN);
+	
+	//new_termios.c_oflag |= ONLCR;
+	//new_termios.c_lflag |= ISIG;
+	tcsetattr(0, TCSANOW, &new_termios);
+}
+
+int kbhit()
+{
+	struct timeval tv = { 0L, 0L };
+	fd_set fds;
+	FD_ZERO(&fds);
+	FD_SET(0, &fds);
+	return select(1, &fds, NULL, NULL, &tv);
+}
+
+int getch()
+{
+	int r;
+	unsigned char c;
+	if ((r = read(0, &c, sizeof(c))) < 0) { return r; }
+	else { return c; }
+}

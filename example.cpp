@@ -3,10 +3,13 @@
 #include <iostream>
 #include "PixelTerm.h"
 #include "Projection.h"
+#include <sys/ioctl.h>
+#include <sys/kd.h>
 
 int main()
 {
 	set_conio_terminal_mode();
+	ioctl(0, KDSETMODE, KD_GRAPHICS);
 	Projection renderer;
 
 	long long t = 0;
