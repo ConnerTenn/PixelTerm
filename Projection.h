@@ -121,12 +121,14 @@ struct Line
 {
 	Vec3 Point1;
 	Vec3 Point2;
+	RGB Colour = {0xff,0xff,0xff};
 
 	Line Transform(const Matrix<double,4,4> &mat)
 	{
 		Line line;
 		line.Point1 = Point1.Transform(mat);
 		line.Point2 = Point2.Transform(mat);
+		line.Colour=Colour;
 		return line;
 	}
 
@@ -215,7 +217,7 @@ public:
 private:
 	void DrawLine(Line &line)
 	{
-		PixelTerm::DrawLine(line.Point1.X, line.Point1.Y, line.Point2.X, line.Point2.Y, {0xff,0xff,0xff});
+		PixelTerm::DrawLine(line.Point1.X, line.Point1.Y, line.Point2.X, line.Point2.Y, line.Colour);
 	}
 
 public:

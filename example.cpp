@@ -64,9 +64,9 @@ int main()
 				double z3nn = z1n+sin(a1n)*cos(a2n);
 				double y3nn = 3*sin(a2n);
 
-				lines.push_back(Line{{x2,y2,z2}, {x2n,y2n,z2n}}.Transform(transMat));
-				lines.push_back(Line{{x2,y2,z2}, {x3n,y3n,z3n}}.Transform(transMat));
-				lines.push_back(Line{{x2,y2,z2}, {x3nn,y3nn,z3nn}}.Transform(transMat));
+				lines.push_back(Line{{x2,y2,z2}, {x2n,y2n,z2n}, RGBVal({a1/TAU,1})}.Transform(transMat));
+				lines.push_back(Line{{x2,y2,z2}, {x3n,y3n,z3n}, RGBVal({a1/TAU,1})}.Transform(transMat));
+				lines.push_back(Line{{x2,y2,z2}, {x3nn,y3nn,z3nn}, RGBVal({a1/TAU,1})}.Transform(transMat));
 			}
 		}
 		renderer.QueueLines(lines);
