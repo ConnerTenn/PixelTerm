@@ -70,22 +70,31 @@ void PixelTerm::DrawRectangle(int x, int y, int w, int h, RGB colour)
 }
 void PixelTerm::DrawLine(int x0, int y0, int x1, int y1, RGB colour)
 {
-	//int x, y;
+	x0=MIN(MAX(x0,0),Width);
+	y0=MIN(MAX(y0,0),Height);
+	x1=MIN(MAX(x1,0),Width);
+	y1=MIN(MAX(y1,0),Height);
+
+	int x=x0, y=y0;	
+
 	//if (x1>x2) { x=x1; x1=x2; x2=x; }
 	//if (y1>y2) { y=y1; y1=y2; y2=y; }
 	int dx = abs(x1-x0), dy = -abs(y1-y0);
 	int sx = (x0<x1 ? 1 : -1), sy = (y0<y1 ? 1 : -1);
 	int err = dx+dy;
-	
+
 	//printf("%d,%d -> %d,%d\n",x0,y0,x1,y1);
 	while(true)
 	{
-		if (x0==x1 && y0==y1) { break; }
+		if (x==x1 && y==y1) { break; }
 		int e2 = 2*err;
-		if (e2 >= dy) { err+=dy; x0+=sx; }
-		if (e2 <= dx) { err+=dx; y0+=sy; }
+		if (e2 >= dy) { err+=dy; x+=sx; }
+		if (e2 <= dx) { err+=dx; y+=sy; }
 		//printf("%d %d\n", x0, y0);
-		*(u_int32_t *)(FB1 + y0*Width*4 + x0*4) = colour.XColour();
+		if (0<x && x<Width && 0<y && y<Height)
+		{
+			*(u_int32_t *)(FB1 + y*Width*4 + x*4) = colour.XColour();
+		}
 	}
 	//printf("\n");
 }
