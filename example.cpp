@@ -9,7 +9,7 @@
 int main()
 {
 	set_conio_terminal_mode();
-	ioctl(0, KDSETMODE, KD_GRAPHICS);
+	//ioctl(0, KDSETMODE, KD_GRAPHICS);
 	Projection renderer;
 
 	long long t = 0;

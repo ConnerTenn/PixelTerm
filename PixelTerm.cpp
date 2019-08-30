@@ -1,133 +1,114 @@
 
 #include "PixelTerm.h"
+#include <math.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <string.h>
 
 //RGB::RGB() { }
 //RGB::RGB(u64 data) { Pixel = data; }
 //RGB::RGB(u8 r, u8 g, u8 b) { R=r; G=g; B=b; }
-u_int64_t RGB::XColour()
+u_int32_t RGB::XColour()
 {
-	return (B<<8*0) | (G<<8*1) | (R<<8*2) | (0xff<<8*3);
+	return (B<<8*0) | (G<<8*1) | (R<<8*2);// | (0x00<<8*3);
 }
 
-x11_info *PixelTerm::Xi = 0;
-w3mimg_op *PixelTerm::W_op = 0;
-int PixelTerm::Width=0, PixelTerm::Height=0;
+unsigned char *PixelTerm::FB0=0, *PixelTerm::FB1=0;
+int PixelTerm::Width=0, PixelTerm::Height=0, PixelTerm::FBsize=0;
 
-Image::Image(int width, int height)
-{
-	XWindowAttributes attr;
-	XGetWindowAttributes(PixelTerm::Xi->display, PixelTerm::Xi->window, &attr);
-	XVisualInfo info;
-	XMatchVisualInfo(PixelTerm::Xi->display, 0, attr.depth, TrueColor, &info);
-	u_int32_t *data = new u_int32_t[width*height];
-	Raw = data;
-	Ximage = XCreateImage(PixelTerm::Xi->display, info.visual, attr.depth, XYPixmap, 0, (char *)data, width, height, 32, 0);
-	XInitImage(Ximage);
-}
-Image::~Image()
-{
-	XDestroyImage(Ximage);
-}
-void Image::Pixel(int x, int y, RGB colour)
-{
-	XPutPixel(Ximage, x, y, colour.XColour());
-	//Raw[y*] = 0xffffffff;//colour.XColour();
-}
 
 bool PixelTerm::Init()
 {
-	W_op = w3mimg_open();
-	if (!W_op) { return false; }
-	W_op->offset_x = 0;
-	W_op->offset_y = 0;
-	W_op->max_anim = 100;
-	W_op->clear_margin = 0;
+	int sizefd = open("/sys/class/graphics/fb0/virtual_size", O_RDONLY);
+	char sizebuff[32];
+	read(sizefd, sizebuff, 32);
+	Width=atoi(sizebuff);
+	Height=atoi(sizebuff+(int)log10(Width)+2);
+	FBsize=Width*Height*4;
+	close(sizefd);
+	printf("Width:%d Height:%d Size:%d\n", Width, Height, FBsize);
 
-	Width=W_op->width;
-	Height=W_op->height;
-	printf("%dx%d\n",Width,Height);
+	int dispfd = open("/dev/fb0", O_RDWR);
+	printf("Display File Descriptor: %d\n", dispfd);
 
-	if (!W_op->init(W_op)) { return false; }
-	W_op->set_background(W_op, 0);
+	FB0 = (unsigned char *)mmap(0, FBsize, PROT_WRITE|PROT_READ, MAP_SHARED|MAP_POPULATE|MAP_LOCKED,dispfd,0);
+	printf("mmap Address: %p\n", FB0);
+	if (FB0==MAP_FAILED) { perror("Error: mmap failed: "); return false; }
+	close(dispfd);
 
-	Xi = (x11_info *)W_op->priv;
-
+	FB1=(unsigned char *)malloc(FBsize);
+	
 	return true;
 }
 void PixelTerm::Close()
 {
-	W_op->close(W_op);
+	free(FB1);
+	munmap(FB0, FBsize);
 }
 
 void PixelTerm::Draw()
 {
-	W_op->sync(W_op);
+	memcpy(FB0, FB1, FBsize);
 }
 void PixelTerm::Clear()
 {
-	W_op->clear(W_op, 0, 0, 0, 0);
+	
 }
 void PixelTerm::ForceClear()
 {
-	DrawRectangle(0,0,Width,Height, {0,0,0});
+	memset(FB1, 0, FBsize);
 }
 void PixelTerm::DrawPixel(int x, int y, RGB colour)
 {
-	XGCValues values;
-	values.foreground = colour.XColour();
-	unsigned long mask = GCForeground;
-	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
-	XDrawPoint(Xi->display, Xi->window, gc, x, y);
-	XFreeGC(Xi->display, gc);
+	
 }
 void PixelTerm::DrawRectangle(int x, int y, int w, int h, RGB colour)
 {
-	XGCValues values;
-	values.foreground = colour.XColour();
-	unsigned long mask = GCForeground;
-	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
-	XFillRectangle(Xi->display, Xi->window, gc, x, y, w, h);
-	XFreeGC(Xi->display, gc);
+
 }
-void PixelTerm::DrawLine(int x1, int y1, int x2, int y2, RGB colour)
+void PixelTerm::DrawLine(int x0, int y0, int x1, int y1, RGB colour)
 {
-	XGCValues values;
-	values.foreground = colour.XColour();
-	unsigned long mask = GCForeground;
-	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
-	XDrawLine(Xi->display, Xi->window, gc, x1, y1, x2, y2);
-	XFreeGC(Xi->display, gc);
-}
-void PixelTerm::DrawImage(int x, int y, Image *image)
-{
-	XGCValues values;
-	values.foreground = 0xffffff;
-	values.background = 0xffffff;
-	unsigned long mask = GCForeground | GCBackground;
-	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
-	XPutImage(Xi->display, Xi->window, gc, image->Ximage, 0, 0, x, y, image->Width, image->Height);
-	XFreeGC(Xi->display, gc);
-}
-void PixelTerm::DrawText(int x, int y, std::string text, RGB colour)
-{
+	//int x, y;
+	//if (x1>x2) { x=x1; x1=x2; x2=x; }
+	//if (y1>y2) { y=y1; y1=y2; y2=y; }
+	int dx = abs(x1-x0), dy = -abs(y1-y0);
+	int sx = (x0<x1 ? 1 : -1), sy = (y0<y1 ? 1 : -1);
+	int err = dx+dy;
 	
-	//
-	XGCValues values;
-	values.foreground = colour.XColour();
-	//values.font = font->fid;
-	unsigned long mask = GCForeground;// | GCFont;
-	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
-	//XFontStruct *font = XQueryFont(Xi->display, XGContextFromGC(gc));
-	//XTextItem textItem;
-	//textItem.chars = (char *)text.c_str();
-	//textItem.nchars = text.length();
-	//textItem.font = font->fid;
-	//XDrawText(Xi->display, Xi->window, gc, x, y, &textItem, 1);
-	//XFreeFontInfo(0, font, 1);
-	//XDrawImageString(Xi->display, Xi->window, gc, x, y, text.c_str(), text.length());
-	XDrawString(Xi->display, Xi->window, gc, x, y, text.c_str(), text.length());
-	XFreeGC(Xi->display, gc);
+	//printf("%d,%d -> %d,%d\n",x0,y0,x1,y1);
+	while(true)
+	{
+		if (x0==x1 && y0==y1) { break; }
+		int e2 = 2*err;
+		if (e2 >= dy) { err+=dy; x0+=sx; }
+		if (e2 <= dx) { err+=dx; y0+=sy; }
+		//printf("%d %d\n", x0, y0);
+		*(u_int32_t *)(FB1 + y0*Width*4 + x0*4) = colour.XColour();
+	}
+	//printf("\n");
 }
+// void PixelTerm::DrawText(int x, int y, std::string text, RGB colour)
+// {
+//	
+//	//
+//	XGCValues values;
+//	values.foreground = colour.XColour();
+//	//values.font = font->fid;
+//	unsigned long mask = GCForeground;// | GCFont;
+//	GC gc = XCreateGC(Xi->display, Xi->window, mask, &values);
+//	//XFontStruct *font = XQueryFont(Xi->display, XGContextFromGC(gc));
+//	//XTextItem textItem;
+//	//textItem.chars = (char *)text.c_str();
+//	//textItem.nchars = text.length();
+//	//textItem.font = font->fid;
+//	//XDrawText(Xi->display, Xi->window, gc, x, y, &textItem, 1);
+//	//XFreeFontInfo(0, font, 1);
+//	//XDrawImageString(Xi->display, Xi->window, gc, x, y, text.c_str(), text.length());
+//	XDrawString(Xi->display, Xi->window, gc, x, y, text.c_str(), text.length());
+//	XFreeGC(Xi->display, gc);
+// }
 
 int PixelTerm::GetWidth() { return Width; }
 int PixelTerm::GetHeight() { return Height; }
@@ -181,3 +162,4 @@ int getch()
 	if ((r = read(0, &c, sizeof(c))) < 0) { return r; }
 	else { return c; }
 }
+

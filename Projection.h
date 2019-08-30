@@ -238,7 +238,7 @@ public:
 	void Render(const Camera &cam)
 	{
 		PixelTerm::ForceClear();
-		PixelTerm::DrawText(10,20,"PixelTerm Demo", {0,0xff,0});
+		//PixelTerm::DrawText(10,20,"PixelTerm Demo", {0,0xff,0});
 
 
 		Matrix<double,4,4> projmat;

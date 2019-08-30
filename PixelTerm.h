@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <w3mimg.h>
+//#include <w3mimg.h>
 #include <unistd.h>
 #include <string>
 
@@ -29,7 +29,7 @@ struct RGB
 	u_int8_t R;
 	u_int8_t G;
 	u_int8_t B;
-	u_int64_t XColour();
+	u_int32_t XColour();
 };
 
 struct ColourVal
@@ -67,32 +67,11 @@ inline RGB RGBVal(ColourVal val)
 
 
 
-
-class PixelTerm;
-class Image;
-
-class Image
-{
-	friend PixelTerm;
-private:
-	XImage *Ximage;
-	u_int32_t *Raw;
-	int Width, Height;
-public:
-	Image(int width, int height);
-//	Image(const Image &other);
-	~Image();
-
-	void Pixel(int x, int y, RGB colour);
-};
-
 class PixelTerm
 {
-	friend Image;
 private:
-	static x11_info *Xi;
-	static w3mimg_op *W_op;
-	static int Width, Height;
+	static unsigned char *FB0, *FB1;
+	static int Width, Height, FBsize;
 
 public:
 	static bool Init();
@@ -103,9 +82,8 @@ public:
 	static void ForceClear();
 	static void DrawPixel(int x, int y, RGB colour);
 	static void DrawRectangle(int x, int y, int w, int h, RGB colour);
-	static void DrawLine(int x1, int y1, int x2, int y2, RGB colour);
-	static void DrawImage(int x, int y, Image *image);
-	static void DrawText(int x, int y, std::string text, RGB colour);
+	static void DrawLine(int x0, int y0, int x1, int y1, RGB colour);
+	//static void DrawText(int x, int y, std::string text, RGB colour);
 
 	static int GetWidth();
 	static int GetHeight();
